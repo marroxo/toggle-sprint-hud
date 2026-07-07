@@ -13,7 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Toggle permanent sprint with a keybind, plus a clean on-screen indicator (26.2 Fabric HUD API).
+ * Tap the vanilla Sprint key to toggle permanent sprint, with a clean on-screen indicator (26.2 Fabric HUD API).
+ * Uses whatever key Sprint is bound to - no separate keybind.
  */
 public class ToggleSprintClient implements ClientModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("togglesprint");
@@ -24,25 +25,32 @@ public class ToggleSprintClient implements ClientModInitializer {
     /** Whether permanent sprint is currently toggled on. */
     public static boolean enabled = false;
 
-    private KeyMapping toggleKey;
+    // Rising-edge detection on the physical sprint key (unaffected by our own setDown).
+    private boolean wasSprintDown = false;
 
     @Override
     public void onInitializeClient() {
-        // Unbound by default so it never clashes; the user binds it in Controls.
-        toggleKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-            "key.togglesprint.toggle",
-            InputConstants.Type.KEYSYM,
-            InputConstants.UNKNOWN.getValue(),
-            KeyMapping.Category.MOVEMENT
-        ));
-
         ClientTickEvents.END_CLIENT_TICK.register(mc -> {
-            while (toggleKey.consumeClick()) {
-                enabled = !enabled;
+            if (mc.player == null) {
+                wasSprintDown = false;
+                return;
             }
-            // While toggled on, hold the vanilla sprint key so the player keeps sprinting.
-            if (enabled && mc.player != null) {
-                mc.options.keySprint.setDown(true);
+
+            KeyMapping sprint = mc.options.keySprint;
+            InputConstants.Key key = KeyMappingHelper.getBoundKeyOf(sprint);
+
+            // Only keyboard-bound sprint can be polled physically; mouse-bound falls back to no toggle.
+            boolean down = key.getType() == InputConstants.Type.KEYSYM
+                && InputConstants.isKeyDown(mc.getWindow(), key.getValue());
+
+            if (down && !wasSprintDown) {
+                enabled = !enabled; // a fresh tap flips the toggle
+            }
+            wasSprintDown = down;
+
+            // While toggled on, hold the sprint key so the player keeps sprinting without holding it.
+            if (enabled) {
+                sprint.setDown(true);
             }
         });
 
@@ -64,7 +72,6 @@ public class ToggleSprintClient implements ClientModInitializer {
                 int wReal = (int) (width * s);
                 int hReal = (int) (height * s);
 
-                // Real-pixel top-left, accounting for the scaled text size.
                 int rx, ry;
                 switch (CONFIG.position) {
                     case TOP_LEFT -> { rx = MARGIN; ry = MARGIN; }
@@ -78,7 +85,6 @@ public class ToggleSprintClient implements ClientModInitializer {
                 int dx = scaled ? (int) Math.round(rx / s) : rx;
                 int dy = scaled ? (int) Math.round(ry / s) : ry;
 
-                // Only touch the matrix stack when actually scaling.
                 if (scaled) {
                     ctx.pose().pushMatrix();
                     ctx.pose().scale((float) s, (float) s);
