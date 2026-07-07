@@ -63,7 +63,7 @@ public class ToggleSprintClient implements ClientModInitializer {
 
                 Font font = mc.font;
                 String text = enabled ? "Sprinting" : "Sprint Off";
-                int color = enabled ? CONFIG.onColor : CONFIG.offColor;
+                int color = 0xFFFFFFFF; // always white, like the clock
 
                 int width = font.width(text);
                 int height = font.lineHeight;
