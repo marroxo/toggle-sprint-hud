@@ -30,9 +30,9 @@ public final class SprintConfig {
     public double scale = 1.0;
     public Position position = Position.TOP_RIGHT;
 
-    // ARGB colors for the ON / OFF states.
-    public int onColor = 0xFF55FF55;
-    public int offColor = 0xFFAAAAAA;
+    // ARGB colors for the ON / OFF states. White like the clock by default.
+    public int onColor = 0xFFFFFFFF;
+    public int offColor = 0xFFFFFFFF;
 
     public static SprintConfig load() {
         SprintConfig c = new SprintConfig();
