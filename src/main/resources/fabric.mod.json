@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "togglesprint",
+  "version": "${version}",
+  "name": "Toggle Sprint HUD",
+  "description": "Toggle permanent sprint with a keybind and a clean on-screen indicator. Configurable via Mod Menu.",
+  "authors": ["andric.studio"],
+  "contact": {
+    "homepage": "https://andric.studio"
+  },
+  "license": "MIT",
+  "icon": "assets/togglesprint/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["studio.andric.togglesprint.ToggleSprintClient"],
+    "modmenu": ["studio.andric.togglesprint.ToggleSprintModMenu"]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=25",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}
