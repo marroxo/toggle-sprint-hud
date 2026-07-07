@@ -74,18 +74,24 @@ public class ToggleSprintClient implements ClientModInitializer {
                     default -> { rx = ctx.guiWidth() - wReal - MARGIN; ry = MARGIN; } // TOP_RIGHT
                 }
 
-                // Draw inside a scaled matrix; coordinates are divided by the scale.
-                var pose = ctx.pose();
-                pose.pushMatrix();
-                pose.scale((float) s, (float) s);
-                int dx = (int) Math.round(rx / s);
-                int dy = (int) Math.round(ry / s);
+                boolean scaled = Math.abs(s - 1.0) > 0.001;
+                int dx = scaled ? (int) Math.round(rx / s) : rx;
+                int dy = scaled ? (int) Math.round(ry / s) : ry;
+
+                // Only touch the matrix stack when actually scaling.
+                if (scaled) {
+                    ctx.pose().pushMatrix();
+                    ctx.pose().scale((float) s, (float) s);
+                }
 
                 if (CONFIG.background) {
                     ctx.fill(dx - 3, dy - 2, dx + width + 3, dy + height + 1, 0x90000000);
                 }
                 ctx.text(font, text, dx, dy, color, CONFIG.shadow);
-                pose.popMatrix();
+
+                if (scaled) {
+                    ctx.pose().popMatrix();
+                }
             }
         );
 

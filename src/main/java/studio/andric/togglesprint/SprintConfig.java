@@ -24,7 +24,7 @@ public final class SprintConfig {
     private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("togglesprint.properties");
 
     /** Show the indicator even when sprint toggle is OFF. */
-    public boolean showWhenOff = false;
+    public boolean showWhenOff = true;
     public boolean shadow = true;
     public boolean background = true;
     public double scale = 1.0;
