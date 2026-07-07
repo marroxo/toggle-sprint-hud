@@ -60,22 +60,32 @@ public class ToggleSprintClient implements ClientModInitializer {
                 int width = font.width(text);
                 int height = font.lineHeight;
 
-                int x, y; // top-left of the text
+                double s = CONFIG.scale;
+                int wReal = (int) (width * s);
+                int hReal = (int) (height * s);
+
+                // Real-pixel top-left, accounting for the scaled text size.
+                int rx, ry;
                 switch (CONFIG.position) {
-                    case TOP_LEFT -> { x = MARGIN; y = MARGIN; }
-                    case TOP_RIGHT -> { x = ctx.guiWidth() - width - MARGIN; y = MARGIN; }
-                    case BOTTOM_LEFT -> { x = MARGIN; y = ctx.guiHeight() - height - MARGIN; }
-                    case BOTTOM_RIGHT -> { x = ctx.guiWidth() - width - MARGIN; y = ctx.guiHeight() - height - MARGIN; }
-                    default -> { // ABOVE_HOTBAR: centered, just above the hotbar/xp bar
-                        x = (ctx.guiWidth() - width) / 2;
-                        y = ctx.guiHeight() - 59;
-                    }
+                    case TOP_LEFT -> { rx = MARGIN; ry = MARGIN; }
+                    case BOTTOM_LEFT -> { rx = MARGIN; ry = ctx.guiHeight() - hReal - MARGIN; }
+                    case BOTTOM_RIGHT -> { rx = ctx.guiWidth() - wReal - MARGIN; ry = ctx.guiHeight() - hReal - MARGIN; }
+                    case ABOVE_HOTBAR -> { rx = (ctx.guiWidth() - wReal) / 2; ry = ctx.guiHeight() - 59 - (hReal - height); }
+                    default -> { rx = ctx.guiWidth() - wReal - MARGIN; ry = MARGIN; } // TOP_RIGHT
                 }
 
+                // Draw inside a scaled matrix; coordinates are divided by the scale.
+                var pose = ctx.pose();
+                pose.pushMatrix();
+                pose.scale((float) s, (float) s);
+                int dx = (int) Math.round(rx / s);
+                int dy = (int) Math.round(ry / s);
+
                 if (CONFIG.background) {
-                    ctx.fill(x - 3, y - 2, x + width + 3, y + height + 1, 0x90000000);
+                    ctx.fill(dx - 3, dy - 2, dx + width + 3, dy + height + 1, 0x90000000);
                 }
-                ctx.text(font, text, x, y, color, CONFIG.shadow);
+                ctx.text(font, text, dx, dy, color, CONFIG.shadow);
+                pose.popMatrix();
             }
         );
 

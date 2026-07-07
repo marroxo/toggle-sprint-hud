@@ -27,7 +27,8 @@ public final class SprintConfig {
     public boolean showWhenOff = false;
     public boolean shadow = true;
     public boolean background = true;
-    public Position position = Position.ABOVE_HOTBAR;
+    public double scale = 1.0;
+    public Position position = Position.TOP_RIGHT;
 
     // ARGB colors for the ON / OFF states.
     public int onColor = 0xFF55FF55;
@@ -42,7 +43,8 @@ public final class SprintConfig {
                 c.showWhenOff = Boolean.parseBoolean(p.getProperty("showWhenOff", "false"));
                 c.shadow = Boolean.parseBoolean(p.getProperty("shadow", "true"));
                 c.background = Boolean.parseBoolean(p.getProperty("background", "true"));
-                c.position = parsePosition(p.getProperty("position"), Position.ABOVE_HOTBAR);
+                c.scale = parseScale(p.getProperty("scale"), 1.0);
+                c.position = parsePosition(p.getProperty("position"), Position.TOP_RIGHT);
                 c.onColor = parseColor(p.getProperty("onColor"), 0xFF55FF55);
                 c.offColor = parseColor(p.getProperty("offColor"), 0xFFAAAAAA);
             } catch (IOException e) {
@@ -57,6 +59,7 @@ public final class SprintConfig {
         p.setProperty("showWhenOff", Boolean.toString(showWhenOff));
         p.setProperty("shadow", Boolean.toString(shadow));
         p.setProperty("background", Boolean.toString(background));
+        p.setProperty("scale", Double.toString(scale));
         p.setProperty("position", position.name());
         p.setProperty("onColor", Integer.toHexString(onColor));
         p.setProperty("offColor", Integer.toHexString(offColor));
@@ -64,6 +67,15 @@ public final class SprintConfig {
             p.store(out, "Toggle Sprint HUD config");
         } catch (IOException e) {
             ToggleSprintClient.LOGGER.warn("Failed to save config", e);
+        }
+    }
+
+    private static double parseScale(String s, double fallback) {
+        if (s == null) return fallback;
+        try {
+            return Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+            return fallback;
         }
     }
 

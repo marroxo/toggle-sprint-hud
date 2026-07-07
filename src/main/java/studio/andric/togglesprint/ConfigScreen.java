@@ -42,16 +42,24 @@ public class ConfigScreen extends Screen {
                 config.save();
             }));
 
+        addRenderableWidget(CycleButton.<Double>builder(
+                v -> Component.literal(v + "x"), config.scale)
+            .withValues(0.5, 0.75, 1.0, 1.25, 1.5, 2.0)
+            .create(x, y + gap * 3, w, 20, Component.literal("Font size"), (btn, val) -> {
+                config.scale = val;
+                config.save();
+            }));
+
         addRenderableWidget(CycleButton.<SprintConfig.Position>builder(
                 pos -> Component.literal(pretty(pos)), config.position)
             .withValues(SprintConfig.Position.values())
-            .create(x, y + gap * 3, w, 20, Component.literal("Position"), (btn, val) -> {
+            .create(x, y + gap * 4, w, 20, Component.literal("Position"), (btn, val) -> {
                 config.position = val;
                 config.save();
             }));
 
         addRenderableWidget(Button.builder(Component.literal("Done"), btn -> onClose())
-            .bounds(x, y + gap * 4 + 8, w, 20)
+            .bounds(x, y + gap * 5 + 8, w, 20)
             .build());
     }
 
