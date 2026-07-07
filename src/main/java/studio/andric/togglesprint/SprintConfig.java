@@ -26,7 +26,7 @@ public final class SprintConfig {
     /** Show the indicator even when sprint toggle is OFF. */
     public boolean showWhenOff = true;
     public boolean shadow = true;
-    public boolean background = true;
+    public boolean background = false;
     public double scale = 1.0;
     public Position position = Position.TOP_RIGHT;
 
